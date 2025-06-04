@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>جاري التحويل...</title>
+</head>
+<body>
+  <h2>⏳ يتم الآن تحويلك للرابط المطلوب...</h2>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc,
+      increment,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBP0oQPZ4E9zaOYZGNVjqWxyjXde2SnOxs",
+      authDomain: "short-link8288.firebaseapp.com",
+      projectId: "short-link8288",
+      storageBucket: "short-link8288.firebasestorage.app",
+      messagingSenderId: "316156644329",
+      appId: "1:316156644329:web:ed593b1e7e465a01901978",
+      measurementId: "G-HFG4329G97"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // قراءة معرف الرابط المختصر من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkID = urlParams.get("id");
+
+    if (linkID) {
+      const linkRef = doc(db, "links", linkID);
+
+      getDoc(linkRef).then(async (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const originalURL = data.originalURL;
+
+          // تحديد الزائر الحالي
+          const visitorID = getVisitorID();
+
+          const isUnique = !data.visitors.includes(visitorID);
+
+          // تحديث الإحصائيات
+          const updateData = {
+            totalClicks: increment(1),
+          };
+
+          if (isUnique) {
+            updateData.uniqueClicks = increment(1);
+            updateData.visitors = arrayUnion(visitorID);
+          }
+
+          await updateDoc(linkRef, updateData);
+
+          // التحويل للرابط الأصلي
+          window.location.href = originalURL;
+        } else {
+          document.body.innerHTML = "<h3>الرابط غير موجود</h3>";
+        }
+      });
+    } else {
+      document.body.innerHTML = "<h3>رابط غير صحيح</h3>";
+    }
+
+    // توليد معرف الزائر (تخزينه محليًا)
+    function getVisitorID() {
+      const key = "visitorID";
+      let id = localStorage.getItem(key);
+      if (!id) {
+        id = Math.random().toString(36).substring(2, 12);
+        localStorage.setItem(key, id);
+      }
+      return id;
+    }
+  </script>
+</body>
+</html>
