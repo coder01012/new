@@ -1,1 +1,23 @@
-hello
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختصار الروابط</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🔗 اختصر روابطك بسهولة</h1>
+    <input type="url" id="originalLink" placeholder="أدخل الرابط الأصلي" />
+    <button id="shortenBtn">اختصر الآن</button>
+
+    <div id="linksContainer">
+      <h2>📄 روابطك المختصرة</h2>
+      <ul id="linksList"></ul>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
