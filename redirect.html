@@ -3,107 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>جارٍ تحويلك...</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBP0oQPZ4E9zaOYZGNVjqWxyjXde2SnOxs",
-      authDomain: "short-link8288.firebaseapp.com",
-      projectId: "short-link8288",
-      storageBucket: "short-link8288.appspot.com",
-      messagingSenderId: "316156644329",
-      appId: "1:316156644329:web:ed593b1e7e465a01901978",
-      measurementId: "G-HFG4329G97"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore();
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get("id");
-
-      if (id) {
-        const docRef = doc(db, "links", id);
-        getDoc(docRef).then(async (docSnap) => {
-          if (docSnap.exists()) {
-            try {
-              // الحصول على عنوان IP
-              const ipResponse = await fetch("https://api.ipify.org?format=json");
-              const ipData = await ipResponse.json();
-              const ip = ipData.ip;
-
-              // تحديث البيانات في Firebase
-              await updateDoc(docRef, {
-                clicks: increment(1),
-                uniqueClicks: arrayUnion(ip),
-                lastAccessed: new Date()
-              });
-
-              // التحقق من أن الرابط يبدأ بـ http:// أو https://
-              let originalURL = docSnap.data().originalURL;
-              if (!originalURL.startsWith('http://') && !originalURL.startsWith('https://')) {
-                originalURL = 'http://' + originalURL;
-              }
-
-              // إعادة التوجيه إلى الرابط الأصلي
-              window.location.replace(originalURL);
-            } catch (error) {
-              console.error("Error:", error);
-              document.body.innerHTML = `
-                <h1>⚠️ حدث خطأ أثناء التوجيه</h1>
-                <p>${error.message}</p>
-                <a href="index.html">العودة للصفحة الرئيسية</a>
-              `;
-            }
-          } else {
-            document.body.innerHTML = `
-              <h1>❌ الرابط غير موجود</h1>
-              <a href="index.html">العودة للصفحة الرئيسية</a>
-            `;
-          }
-        }).catch(error => {
-          console.error("Error:", error);
-          document.body.innerHTML = `
-            <h1>⚠️ حدث خطأ في الخادم</h1>
-            <p>${error.message}</p>
-            <a href="index.html">العودة للصفحة الرئيسية</a>
-          `;
-        });
-      } else {
-        document.body.innerHTML = `
-          <h1>❌ لا يوجد معرف للرابط</h1>
-          <a href="index.html">العودة للصفحة الرئيسية</a>
-        `;
-      }
-    });
-  </script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      direction: rtl;
-    }
-    h1 {
-      color: #d9534f;
-    }
-    a {
-      color: #337ab7;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      border: 1px solid #337ab7;
-      border-radius: 5px;
-    }
-    a:hover {
-      background-color: #f0f0f0;
-    }
-  </style>
+  <script type="module" src="redirect.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>⏳ جاري تحويلك...</h1>
+  <div class="redirect-container">
+    <h1>⏳ جاري تحويلك...</h1>
+    <div class="loader"></div>
+    <p id="error-message" style="display:none; color:red;"></p>
+  </div>
 </body>
 </html>
