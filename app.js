@@ -1,8 +1,16 @@
-// app.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-const firebaseConfig = { /* نفس بياناتك */ };
+const firebaseConfig = {
+  apiKey: "AIzaSyBP0oQPZ4E9zaOYZGNVjqWxyjXde2SnOxs",
+  authDomain: "short-link8288.firebaseapp.com",
+  projectId: "short-link8288",
+  storageBucket: "short-link8288.appspot.com",
+  messagingSenderId: "316156644329",
+  appId: "1:316156644329:web:ed593b1e7e465a01901978",
+  measurementId: "G-HFG4329G97"
+};
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
@@ -24,8 +32,7 @@ form.addEventListener("submit", async (e) => {
     uniqueClicks: [],
   });
 
-  const shortURL = `${location.origin}/short-link/redirect.html?id=${shortId}`;
-  resultDiv.textContent = `🔗 الرابط المختصر: ${shortURL}`;
-  resultDiv.innerHTML = `<a href="${shortURL}" target="_blank">${shortURL}</a>`;
+  const shortURL = `${location.origin}/redirect.html?id=${shortId}`;
+  resultDiv.innerHTML = `<p>🔗 الرابط المختصر:</p><a href="${shortURL}" target="_blank">${shortURL}</a>`;
   urlInput.value = "";
 });
