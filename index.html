@@ -1,69 +1,94 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>اختصار الروابط</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
       color: #333;
       text-align: center;
-      padding: 50px 20px;
+      padding: 20px;
       direction: rtl;
     }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
     h1 {
-      color: #0077ff;
+      color: #2c3e50;
       margin-bottom: 30px;
     }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      display: inline-block;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    .form-group {
+      margin-bottom: 20px;
     }
     input[type="text"] {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
       font-size: 16px;
+      box-sizing: border-box;
     }
     button {
-      padding: 12px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      background-color: #0077ff;
+      background-color: #3498db;
       color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #005bcc;
+      background-color: #2980b9;
     }
     #result {
-      margin-top: 20px;
-      font-size: 18px;
+      margin-top: 30px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      display: none;
     }
-    #result a {
-      color: #0077ff;
-      text-decoration: none;
-      word-break: break-word;
+    #short-url {
+      color: #2c3e50;
+      font-weight: bold;
+      word-break: break-all;
+    }
+    .copy-btn {
+      background-color: #2ecc71;
+      margin-left: 10px;
+    }
+    .copy-btn:hover {
+      background-color: #27ae60;
     }
   </style>
 </head>
 <body>
-  <h1>🔗 اختصر رابطك بسهولة</h1>
-  <form id="shorten-form">
-    <input type="text" id="url-input" placeholder="أدخل الرابط الأصلي هنا" required />
-    <button type="submit">اختصر الرابط</button>
-  </form>
-  <div id="result"></div>
+  <div class="container">
+    <h1>🔗 اختصر رابطك بسهولة</h1>
+    
+    <div class="form-group">
+      <input type="text" id="url-input" placeholder="أدخل الرابط الأصلي هنا" required>
+    </div>
+    
+    <button id="shorten-btn">اختصر الرابط</button>
+    
+    <div id="result">
+      <p>رابطك المختصر:</p>
+      <div>
+        <a id="short-url" target="_blank"></a>
+        <button id="copy-btn" class="copy-btn">نسخ</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>
