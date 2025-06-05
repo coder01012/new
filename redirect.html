@@ -20,27 +20,88 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore();
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id");
 
-    if (id) {
-      const docRef = doc(db, "links", id);
-      getDoc(docRef).then(async (docSnap) => {
-        if (docSnap.exists()) {
-          const ip = await fetch("https://api.ipify.org?format=json").then(res => res.json()).then(d => d.ip);
-          await updateDoc(docRef, {
-            clicks: increment(1),
-            uniqueClicks: arrayUnion(ip),
-          });
-          location.href = docSnap.data().originalURL;
-        } else {
-          document.body.innerHTML = "<h1>الرابط غير موجود</h1><a href='index.html'>العودة للصفحة الرئيسية</a>";
-        }
-      });
-    } else {
-      document.body.innerHTML = "<h1>لا يوجد معرف للرابط</h1><a href='index.html'>العودة للصفحة الرئيسية</a>";
-    }
+      if (id) {
+        const docRef = doc(db, "links", id);
+        getDoc(docRef).then(async (docSnap) => {
+          if (docSnap.exists()) {
+            try {
+              // الحصول على عنوان IP
+              const ipResponse = await fetch("https://api.ipify.org?format=json");
+              const ipData = await ipResponse.json();
+              const ip = ipData.ip;
+
+              // تحديث البيانات في Firebase
+              await updateDoc(docRef, {
+                clicks: increment(1),
+                uniqueClicks: arrayUnion(ip),
+                lastAccessed: new Date()
+              });
+
+              // التحقق من أن الرابط يبدأ بـ http:// أو https://
+              let originalURL = docSnap.data().originalURL;
+              if (!originalURL.startsWith('http://') && !originalURL.startsWith('https://')) {
+                originalURL = 'http://' + originalURL;
+              }
+
+              // إعادة التوجيه إلى الرابط الأصلي
+              window.location.replace(originalURL);
+            } catch (error) {
+              console.error("Error:", error);
+              document.body.innerHTML = `
+                <h1>⚠️ حدث خطأ أثناء التوجيه</h1>
+                <p>${error.message}</p>
+                <a href="index.html">العودة للصفحة الرئيسية</a>
+              `;
+            }
+          } else {
+            document.body.innerHTML = `
+              <h1>❌ الرابط غير موجود</h1>
+              <a href="index.html">العودة للصفحة الرئيسية</a>
+            `;
+          }
+        }).catch(error => {
+          console.error("Error:", error);
+          document.body.innerHTML = `
+            <h1>⚠️ حدث خطأ في الخادم</h1>
+            <p>${error.message}</p>
+            <a href="index.html">العودة للصفحة الرئيسية</a>
+          `;
+        });
+      } else {
+        document.body.innerHTML = `
+          <h1>❌ لا يوجد معرف للرابط</h1>
+          <a href="index.html">العودة للصفحة الرئيسية</a>
+        `;
+      }
+    });
   </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      direction: rtl;
+    }
+    h1 {
+      color: #d9534f;
+    }
+    a {
+      color: #337ab7;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: 1px solid #337ab7;
+      border-radius: 5px;
+    }
+    a:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
   <h1>⏳ جاري تحويلك...</h1>
