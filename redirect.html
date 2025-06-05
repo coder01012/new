@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <title>جارٍ تحويلك...</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* نفس بياناتك */ };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBP0oQPZ4E9zaOYZGNVjqWxyjXde2SnOxs",
+      authDomain: "short-link8288.firebaseapp.com",
+      projectId: "short-link8288",
+      storageBucket: "short-link8288.appspot.com",
+      messagingSenderId: "316156644329",
+      appId: "1:316156644329:web:ed593b1e7e465a01901978",
+      measurementId: "G-HFG4329G97"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore();
 
@@ -18,16 +27,18 @@
       const docRef = doc(db, "links", id);
       getDoc(docRef).then(async (docSnap) => {
         if (docSnap.exists()) {
+          const ip = await fetch("https://api.ipify.org?format=json").then(res => res.json()).then(d => d.ip);
           await updateDoc(docRef, {
-            clicks: increment(1)
+            clicks: increment(1),
+            uniqueClicks: arrayUnion(ip),
           });
           location.href = docSnap.data().originalURL;
         } else {
-          document.body.innerHTML = "<h1>❌ الرابط غير موجود</h1>";
+          document.body.innerHTML = "<h1>الرابط غير موجود</h1><a href='index.html'>العودة للصفحة الرئيسية</a>";
         }
       });
     } else {
-      document.body.innerHTML = "<h1>❌ لا يوجد معرف للرابط</h1>";
+      document.body.innerHTML = "<h1>لا يوجد معرف للرابط</h1><a href='index.html'>العودة للصفحة الرئيسية</a>";
     }
   </script>
 </head>
