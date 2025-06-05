@@ -14,25 +14,66 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
-const form = document.getElementById("shorten-form");
-const urlInput = document.getElementById("url-input");
-const resultDiv = document.getElementById("result");
+const urlInput = document.getElementById('url-input');
+const shortenBtn = document.getElementById('shorten-btn');
+const resultDiv = document.getElementById('result');
+const shortUrlElement = document.getElementById('short-url');
+const copyBtn = document.getElementById('copy-btn');
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+shortenBtn.addEventListener('click', async () => {
   const originalURL = urlInput.value.trim();
-  if (!originalURL) return;
+  
+  if (!originalURL) {
+    alert('الرجاء إدخال رابط صحيح');
+    return;
+  }
 
-  const shortId = Math.random().toString(36).substring(2, 8);
+  try {
+    shortenBtn.disabled = true;
+    shortenBtn.textContent = 'جاري المعالجة...';
 
-  await setDoc(doc(db, "links", shortId), {
-    originalURL,
-    createdAt: serverTimestamp(),
-    clicks: 0,
-    uniqueClicks: [],
+    // إنشاء معرف فريد للرابط
+    const shortId = Math.random().toString(36).substring(2, 10);
+    
+    // التأكد من أن الرابط يحتوي على بروتوكول
+    let finalURL = originalURL;
+    if (!finalURL.startsWith('http://') && !finalURL.startsWith('https://')) {
+      finalURL = 'http://' + finalURL;
+    }
+
+    // حفظ البيانات في Firebase
+    await setDoc(doc(db, "links", shortId), {
+      originalURL: finalURL,
+      createdAt: serverTimestamp(),
+      clicks: 0,
+      uniqueClicks: [],
+      lastAccessed: null
+    });
+
+    // عرض الرابط المختصر
+    const shortURL = `${window.location.origin}/redirect.html?id=${shortId}`;
+    shortUrlElement.href = shortURL;
+    shortUrlElement.textContent = shortURL;
+    
+    resultDiv.style.display = 'block';
+    urlInput.value = '';
+  } catch (error) {
+    console.error('Error:', error);
+    alert('حدث خطأ أثناء اختصار الرابط: ' + error.message);
+  } finally {
+    shortenBtn.disabled = false;
+    shortenBtn.textContent = 'اختصر الرابط';
+  }
+});
+
+copyBtn.addEventListener('click', () => {
+  const textToCopy = shortUrlElement.textContent;
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    copyBtn.textContent = 'تم النسخ!';
+    setTimeout(() => {
+      copyBtn.textContent = 'نسخ';
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
   });
-
-  const shortURL = `${location.origin}/redirect.html?id=${shortId}`;
-  resultDiv.innerHTML = `<p>🔗 الرابط المختصر:</p><a href="${shortURL}" target="_blank">${shortURL}</a>`;
-  urlInput.value = "";
 });
